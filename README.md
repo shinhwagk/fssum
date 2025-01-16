@@ -13,3 +13,9 @@ cat files.sum  | awk '{print $1}' | sort | uniq -c | sort
 
 cat files.sum | grep 603f91f2e9360ecb80eca9077eef71930c79d94e047b720f3a24f37e37276e64
 ```
+
+
+
+```sh
+python main.py --shasum-dir abc --shasum-file files.sumsha.json --shasum-force
+```
