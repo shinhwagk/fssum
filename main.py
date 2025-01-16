@@ -58,14 +58,13 @@ def main():
     if os.path.exists(args.shasum_file):
         files_shasum = read_shasum(args.shasum_file)
 
-    for source_file in list_all_files(args.shasum_dir):
-        if files_shasum.get(source_file) and not args.shasum_force:
-            print(f"file:{source_file}, shasum skip.")
-            continue
-
-        print(f"file:{source_file}, shasum...")
-        files_shasum[source_file] = {"shasum": hash_file(source_file), "date": get_datetime()}
-        print(f"file:{source_file}, shasum complate.")
+    for f in list_all_files(args.shasum_dir):
+        if args.shasum_force or f not in files_shasum:
+            print(f"file:{f}, shasum...")
+            files_shasum[f] = {"shasum": hash_file(f), "date": get_datetime()}
+            print(f"file:{f}, shasum complate.")
+        else:
+            print(f"file:{f}, shasum skip.")
 
     write_shasum(args.shasum_file, files_shasum)
 
