@@ -7,16 +7,28 @@ from datetime import datetime, timezone
 from typing import Any, Generator
 
 
+SampleThreshold = 1024 * 1024 * 1024
+
+
 def get_datetime():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def hash_file(f: str, chunk_size: int = 8192) -> str:
+def hashCore(f: str) -> str:
     shasum = hashlib.sha256()
-    with open(f, "rb") as fio:
-        while chunk := fio.read(chunk_size):
-            shasum.update(chunk)
-    return shasum.hexdigest()
+    fstat = os.stat(f)
+    with open(f, 'rb') as fio:
+        if fstat.st_size < SampleThreshold:
+            shasum.update(fio.read())
+        else:
+            step = int(fstat.st_size / SampleThreshold)
+            stepSize = int(fstat.st_size / step)
+            for i in range(0, step-1):
+                fio.seek(i*stepSize)
+                shasum.update(fio.read(1))
+            fio.seek(-1, os.SEEK_END)
+            shasum.update(fio.read())
+        return shasum.hexdigest()
 
 
 def list_all_files(dir_path: str) -> Generator[str, Any, None]:
@@ -59,9 +71,12 @@ def main():
         files_shasum = read_shasum(args.shasum_file)
 
     for f in list_all_files(args.shasum_dir):
-        if args.shasum_force or f not in files_shasum:
+        if f == args.shasum_file:
+            continue
+        elif args.shasum_force or f not in files_shasum:
             print(f"file:{f}, shasum...")
-            files_shasum[f] = {"shasum": hash_file(f), "date": get_datetime()}
+            fstat = os.stat(f)
+            files_shasum[f] = {"shasum": hashCore(f), "date": get_datetime()}
             print(f"file:{f}, shasum complate.")
         else:
             print(f"file:{f}, shasum skip.")
