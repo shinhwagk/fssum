@@ -107,8 +107,7 @@ def main():
                     success_cnt += 1
 
             if success_cnt % 100 == 0:
-                pass
-                # write_shasum(args.shasum_file, shasum_data)
+                write_shasum(args.shasum_file, shasum_data)
 
         for fut in concurrent.futures.as_completed(futures.keys()):
             file_sumsha = fut.result()
