@@ -16,6 +16,17 @@ cat files.sum | grep 603f91f2e9360ecb80eca9077eef71930c79d94e047b720f3a24f37e372
 
 
 
+### usage
+files.sumsha.json
+```json
+{
+    "config": {
+        "shasum_dir": "abc",
+        "shasum_sample": 100
+    }
+}
+```
 ```sh
-python main.py --shasum-dir abc --shasum-file files.sumsha.json --shasum-force
+
+python main.py --shasum-file files.sumsha.json [--shasum-force]
 ```
